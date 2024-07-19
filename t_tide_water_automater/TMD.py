@@ -32,11 +32,12 @@ import time
 from datetime import timedelta
 import ttide as tt
 
-from o_functions.start import opsys2; start_path = opsys2()
+from o_func import opsys; start_path = opsys()
 
 
 #%% Constants
-script_path = os.path.abspath(sys.argv[0])[:-7]
+# script_path =os .path.abspath(sys.argv[0])[:-7]
+script_path = os.path.join(start_path, 'GitHub','bc_delft','t_tide_water_automater','TMD.py')
 #script_path = r'/Volumes/PD/GitHub/python-oceanography/Delft 3D FM Suite 2019/8.automated_tides' #Aaron
 #tidal_consts_list = ['M2', 'S2']
 tidal_consts_list = [i.replace(' ','') for i in ['2N2 ','K1  ','K2  ','M2  ','M4  ','MF  ','MM  ','MN4 ','MS4 ','N2  ','O1  ','P1  ','Q1  ','S1  ','S2  ']]
@@ -159,7 +160,7 @@ def convert_to_seconds_since_date(timeseries, date_str):
 
 #%%Set up usage of the example file
 try:
-    input_path = sys.argv[1] 
+    input_path = 'test.txt'
 except:
     print("\nError: Insufficient command-line arguments.")
     print("Usage: python3 TMD.py <programming_file.txt>")
@@ -180,65 +181,63 @@ except:
 #input_path = '/results/example'
 #script_path = r'/Volumes/PD/GitHub/python-oceanography/Delft 3D FM Suite 2019/8.automated_tides'
 #%%
-if input_path == 'example':
-    a = 1
-else:
-    full_output_path = script_path + input_path
+
+full_output_path = os.path.join(os.path.split(script_path)[0], 'results',input_path[:-4])
+
+# if os.path.isdir(full_output_path) == True:
+#     print('Directory exists, continuing program...')
     
-    if os.path.isdir(full_output_path) == True:
-        print('Directory exists, continuing program...')
-        
-        
-        try:
-            f = glob.glob(full_output_path + '/*.txt')
-            if os.path.exists((f)[0]) == True:
-                print('\nText File exists, checking file contents...\n')
-                tide_dir, consts, start, end, timestep = file_reader(f[0])
-                print(tide_dir)
-                print('\nFile checked, continuing to run program...')
-        except:
-            while True:
-                answer = input('Text file does not exist, would you like to create it?')
-                if answer in valid_inputs:
-                    break
-                if answer == 'Y' or 'y':
-                    filename = '/' + full_output_path.split('/')[-1]
-                    with open(full_output_path + filename +  '/.txt', 'w') as f:
-                        f.write("")
-                    f.close()
-                    print('Directories and text file created, please populate it')
-                    sys.exit()
-                else:
-                    print('Please go back and set up text file')
-    else:
-        while True:
-            answer = input('Directory does not exist, would you like to set up filesystem fully (y/Y or n/N) ?: ')            
-            if answer in valid_inputs:
-                break
-        if answer == 'y' or 'Y': # Makes primary output file if it does not exist
-            path = script_path + '/results/'
-            new_path = path + input_path.split('/')[-1].split('.')[0]
-            os.mkdir(new_path)
-            sub_path = new_path + '/tidal_boundary_csvs_per_point'
-            os.mkdir(sub_path)
-            sub_path2 = new_path + '/tidal_heights'
-            os.mkdir(sub_path2)
-            file = new_path + '/'+ input_path.split('/')[-1] + '.txt'
-            with open(file, 'w') as f:
-                f.write("")
-            f.close()
-            print('Directories and text file created, please populate it')
-            sys.exit()
-                
-        else:
-            print('Please go back and check your filesystem setup, exiting program...')
-            sys.exit()
     
+#     try:
+f = glob.glob(full_output_path + '/*.txt')
+#         if os.path.exists((f)[0]) == True:
+#             print('\nText File exists, checking file contents...')
+tide_dir, consts, start, end, timestep = file_reader(f[0])
+#             print(tide_dir)
+#             print('\nFile checked, continuing to run program...')
+#     except:
+#         while True:
+#             answer = input('Text file does not exist, would you like to create it?')
+#             if answer in valid_inputs:
+#                 break
+#             if answer == 'Y' or 'y':
+#                 filename = '/' + full_output_path.split('/')[-1]
+#                 with open(full_output_path + filename +  '/.txt', 'w') as f:
+#                     f.write("")
+#                 f.close()
+#                 print('Directories and text file created, please populate it')
+#                 sys.exit()
+#             else:
+#                 print('Please go back and set up text file')
+# else:
+    # while True:
+    #     answer = 'y'#input('Directory does not exist, would you like to set up filesystem fully (y/Y or n/N) ?: ')            
+    #     if answer in valid_inputs:
+    #         break
+    # if answer == 'y' or 'Y': # Makes primary output file if it does not exist
+    #     path = os.path.join(os.path.split(script_path)[0],'results')
+    #     new_path = os.path.join(path, input_path.split('/')[-1].split('.')[0])
+    #     # os.mkdir(new_path)
+    #     sub_path = os.path.join(new_path,'tidal_boundary_csvs_per_point')
+    #     # os.mkdir(sub_path)
+    #     sub_path2 = os.path.join(new_path,'tidal_heights')
+    #     # os.mkdir(sub_path2)
+    #     file = os.path.join(new_path,input_path.split('/')[-1])
+    #     with open(file, 'w') as f:
+    #         f.write("")
+    #     f.close()
+    #     print('Directories and text file created, please populate it')
+    #     sys.exit()
+            
+    # else:
+    #     print('Please go back and check your filesystem setup, exiting program...')
+    #     sys.exit()
+
     
 extension = r'.pli'
 files = glob.glob(full_output_path + '/*' + extension) # finding boundary conditon file
 if files:
-    print(f"\Pli condition files with extension '{extension}' found: " )  
+    print(f"Pli condition files with extension '{extension}' found: " )  
     for file in files:
         print(file.split('/')[-1])
         
@@ -248,14 +247,14 @@ else:
 filename = file
     
 #Main folder path 
-main_folder_path = script_path + '/results/'+ input_path.split('/')[-1].split('.')[0]
+main_folder_path = os.path.join(os.path.split(script_path)[0],'results', input_path.split('/')[-1].split('.')[0])
 
 #Backup to make file deposit area
-sub_dir = script_path + '/results/'+ input_path.split('/')[-1].split('.')[0] + '/tidal_boundary_csvs_per_point'
+sub_dir = os.path.join(os.path.split(script_path)[0],'results', input_path.split('/')[-1].split('.')[0],'tidal_boundary_csvs_per_point')
 if os.path.exists(sub_dir) == False:
     os.mkdir(sub_dir)
     
-sub_dir2 = script_path + '/results/'+ input_path.split('/')[-1].split('.')[0] + '/tidal_heights'
+sub_dir2 = os.path.join(os.path.split(script_path)[0],'results', input_path.split('/')[-1].split('.')[0], '/tidal_heights')
 if os.path.exists(sub_dir2) == False:
     os.mkdir(sub_dir2)
 
